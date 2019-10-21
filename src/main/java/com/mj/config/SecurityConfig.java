@@ -36,11 +36,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// 设置用户账号信息和权限
 //		auth.inMemoryAuthentication().withUser("admin").password("123456").authorities("showOrder","addOrder","updateOrder","deleteOrder");
 //		auth.inMemoryAuthentication().withUser("user").password("123456").authorities("addOrder");
+
+
 		auth.userDetailsService(myUserDetailsService).passwordEncoder(new PasswordEncoder() {
 			//加密密码
 			@Override
 			public String encode(CharSequence charSequence) {
 				return MD5Util.encode((String)charSequence);
+
 			}
 			//加密匹配密码
 			@Override
@@ -50,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 return equals;
 			}
 		});
+
 
 	}
 
@@ -75,10 +79,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/**").fullyAuthenticated().and().formLogin().loginPage("/login")
 		.and().csrf().disable();
 
+//        http.authorizeRequests().antMatchers("/**").fullyAuthenticated().and().httpBasic();
+
 	}
 
-	@Bean
-	public static NoOpPasswordEncoder passwordEncoder() {
-		return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
-	}
+	//密码不想加密的话，需要加上这个bean
+//	@Bean
+//	public static NoOpPasswordEncoder passwordEncoder() {
+//		return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+//	}
 }

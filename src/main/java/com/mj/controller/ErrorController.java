@@ -2,8 +2,9 @@ package com.mj.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class ErrorController {
 
 	// 403权限不足页面
