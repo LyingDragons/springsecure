@@ -8,11 +8,14 @@ import com.mj.security.MyUserDetailService;
 import com.mj.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -30,6 +33,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private MyUserDetailService myUserDetailsService;
 	@Autowired
 	private PermissionMapper permissionMapper;
+
+
+//	@Bean
+//	public AuthenticationProvider authenticationProvider() {
+//		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//		authenticationProvider.setUserDetailsService(myUserDetailsService);
+//		authenticationProvider.setPasswordEncoder(passwordEncoder());
+//		return authenticationProvider;
+//	}
+
+
+
 	// 用户认证信息
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -38,24 +53,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //		auth.inMemoryAuthentication().withUser("user").password("123456").authorities("addOrder");
 
 
-		auth.userDetailsService(myUserDetailsService).passwordEncoder(new PasswordEncoder() {
-			//加密密码
-			@Override
-			public String encode(CharSequence charSequence) {
-				return MD5Util.encode((String)charSequence);
-
-			}
-			//加密匹配密码
-			@Override
-			public boolean matches(CharSequence charSequence, String encodedPassword) {
-                String encode = MD5Util.encode((String) charSequence);
-                boolean equals = encode.equals(encodedPassword);
-                return equals;
-			}
-		});
-
+		auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder());
+//		auth.authenticationProvider(authenticationProvider());
 
 	}
+
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+
 
 	// 配置HttpSecurity 拦截资源
 	protected void configure(HttpSecurity http) throws Exception {
@@ -76,6 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			authorizeRequests.antMatchers(permission.getUrl()).hasAnyAuthority(permission.getPermTag());
 		}
 		authorizeRequests.antMatchers("/login").permitAll()
+		.antMatchers("/regist").permitAll()
 		.antMatchers("/**").fullyAuthenticated().and().formLogin().loginPage("/login")
 		.and().csrf().disable();
 

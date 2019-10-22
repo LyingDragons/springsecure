@@ -8,4 +8,6 @@ public class MJ {
         String encode = MD5Util.encode((String) "123456");
         System.out.println(encode);
     }
+
+
 }

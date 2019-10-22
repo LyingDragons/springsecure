@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mj.entity.Permission;
 import com.mj.entity.User;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -19,4 +20,7 @@ public interface UserMapper {
 			+ "sys_role_permission role_permission on user_role.role_id = role_permission.role_id "
 			+ " inner join sys_permission permission on role_permission.perm_id = permission.id where user.username = #{userName};")
 	List<Permission> findPermissionByUsername(@Param("userName") String userName);
+
+	@Insert("insert into sys_user(username,password) values(#{username},#{password})")
+	int insert(@Param("username") String username,@Param("password") String password);
 }
